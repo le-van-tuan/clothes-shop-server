@@ -1,0 +1,23 @@
+server:
+  port: 8090
+  servlet:
+    context-path: /api
+spring:
+  datasource:
+    hikari:
+      jdbcUrl: jdbc:postgresql://localhost:5432/clothes_shop
+      username: postgres
+      password: raNDbleC934$
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 1800000
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format-sql: true
