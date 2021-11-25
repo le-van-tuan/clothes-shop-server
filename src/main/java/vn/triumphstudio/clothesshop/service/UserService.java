@@ -1,5 +1,6 @@
 package vn.triumphstudio.clothesshop.service;
 
+import vn.triumphstudio.clothesshop.domain.annotation.AllowAdmin;
 import vn.triumphstudio.clothesshop.domain.entity.ShippingAddressEntity;
 import vn.triumphstudio.clothesshop.domain.entity.UserEntity;
 import vn.triumphstudio.clothesshop.domain.request.ShippingAddressRequest;
@@ -12,6 +13,9 @@ public interface UserService {
     UserEntity getUserByEmail(String email);
 
     UserEntity getUserById(long id);
+
+    @AllowAdmin
+    UserEntity toggleUserStatus(long userId);
 
     UserEntity signUp(SignUpRequest signUpRequest);
 

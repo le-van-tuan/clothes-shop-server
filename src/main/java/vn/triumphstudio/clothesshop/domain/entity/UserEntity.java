@@ -9,6 +9,7 @@ import vn.triumphstudio.clothesshop.domain.enumration.Role;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity(name = "User")
@@ -48,6 +49,10 @@ public class UserEntity {
     @CreationTimestamp
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm a")
     private LocalDateTime createdAt;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private List<WishlistEntity> wishlist;
 
     public Long getId() {
         return id;

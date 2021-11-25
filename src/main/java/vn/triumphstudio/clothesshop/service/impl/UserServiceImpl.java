@@ -38,7 +38,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity getUserById(long id) {
-        return userRepository.getOne(id);
+        return userRepository.findById(id).orElseThrow(() -> new BusinessLogicException("No user found with id = " + id));
+    }
+
+    @Override
+    public UserEntity toggleUserStatus(long userId) {
+        UserEntity user = this.getUserById(userId);
+        user.setEnabled(!user.isEnabled());
+        return this.userRepository.save(user);
     }
 
     @Override
@@ -58,7 +65,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity updateUserProfile(long userId, UserProfileRequest request) {
         UserEntity user = this.getUserById(userId);
-        if (user == null) throw new BusinessLogicException("No user found with id = " + userId);
         user.setName(request.getName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 

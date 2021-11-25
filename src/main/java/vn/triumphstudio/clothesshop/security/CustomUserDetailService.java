@@ -6,7 +6,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import vn.triumphstudio.clothesshop.domain.entity.UserEntity;
-import vn.triumphstudio.clothesshop.exception.BusinessLogicException;
 import vn.triumphstudio.clothesshop.service.UserService;
 
 import javax.transaction.Transactional;
@@ -30,9 +29,6 @@ public class CustomUserDetailService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(long id) {
         UserEntity user = userService.getUserById(id);
-        if (user == null) {
-            throw new BusinessLogicException("No user found with id = " + id);
-        }
         return new UserPrincipal(user);
     }
 }
