@@ -19,17 +19,18 @@ public class ProductImageEntity {
     private long id;
 
     @JsonIgnore
-    @Column(name = "product_id")
-    private long productId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id", nullable = false)
+    private ProductEntity product;
 
-    @JsonIgnore
     @Column(name = "image_type")
     @Enumerated(EnumType.STRING)
-    private ImageType type;
+    private ImageType type = ImageType.GALLERY;
 
     @Column(name = "image_url")
     private String url;
 
+    @JsonIgnore
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -40,6 +41,14 @@ public class ProductImageEntity {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public ProductEntity getProduct() {
+        return product;
+    }
+
+    public void setProduct(ProductEntity product) {
+        this.product = product;
     }
 
     public ImageType getType() {

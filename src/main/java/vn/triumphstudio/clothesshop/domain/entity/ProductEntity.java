@@ -24,7 +24,7 @@ public class ProductEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private List<ProductImageEntity> images;
 
@@ -37,6 +37,8 @@ public class ProductEntity {
     private String description;
 
     private boolean published;
+
+    private boolean deleted;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -97,6 +99,14 @@ public class ProductEntity {
 
     public void setPublished(boolean published) {
         this.published = published;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public LocalDateTime getCreatedAt() {

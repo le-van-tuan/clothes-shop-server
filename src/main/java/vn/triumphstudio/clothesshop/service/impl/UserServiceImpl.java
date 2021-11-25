@@ -4,16 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.triumphstudio.clothesshop.domain.entity.ProductEntity;
 import vn.triumphstudio.clothesshop.domain.entity.ShippingAddressEntity;
 import vn.triumphstudio.clothesshop.domain.entity.UserEntity;
+import vn.triumphstudio.clothesshop.domain.entity.WishlistEntity;
 import vn.triumphstudio.clothesshop.domain.enumration.Role;
 import vn.triumphstudio.clothesshop.domain.request.ShippingAddressRequest;
 import vn.triumphstudio.clothesshop.domain.request.SignUpRequest;
 import vn.triumphstudio.clothesshop.domain.request.UserProfileRequest;
 import vn.triumphstudio.clothesshop.exception.BadRequestException;
 import vn.triumphstudio.clothesshop.exception.BusinessLogicException;
+import vn.triumphstudio.clothesshop.repository.ProductRepository;
 import vn.triumphstudio.clothesshop.repository.ShippingAddressRepository;
 import vn.triumphstudio.clothesshop.repository.UserRepository;
+import vn.triumphstudio.clothesshop.repository.WishlistRepository;
+import vn.triumphstudio.clothesshop.service.ProductService;
 import vn.triumphstudio.clothesshop.service.UserService;
 import vn.triumphstudio.clothesshop.util.SecurityContextUtil;
 
@@ -30,6 +35,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private WishlistRepository wishlistRepository;
 
     @Override
     public UserEntity getUserByEmail(String email) {
@@ -127,5 +138,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserEntity> getAllUsers() {
         return this.userRepository.findAll();
+    }
+
+    @Override
+    public void addProduct2Wishlist(long userId, long productId) {
+        ProductEntity product = this.productService.getProductById(productId);
+        UserEntity user = this.getUserById(userId);
+
+        WishlistEntity wishlist = new WishlistEntity();
+        wishlist.setProduct(product);
+        wishlist.setUser(user);
+        this.wishlistRepository.save(wishlist);
+    }
+
+    @Override
+    public void removeWishlistItem(long userId, long wishlistId) {
+        WishlistEntity entity = this.wishlistRepository.findFirstByUser_IdAndId(userId, wishlistId);
+        this.wishlistRepository.delete(entity);
     }
 }

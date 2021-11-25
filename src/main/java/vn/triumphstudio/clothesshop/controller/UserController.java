@@ -48,4 +48,14 @@ public class UserController {
     public UserEntity updateUserProfile(@Valid @RequestBody UserProfileRequest request) {
         return this.userService.updateUserProfile(SecurityContextUtil.getCurrentUser().getId(), request);
     }
+
+    @GetMapping("/products/{productId}/favorite")
+    public void addProduct2Wishlist(@PathVariable long productId) {
+        this.userService.addProduct2Wishlist(SecurityContextUtil.getCurrentUser().getId(), productId);
+    }
+
+    @DeleteMapping("/products/{id}/favorite")
+    public void removeWishlistItem(@PathVariable("id") long wishlistId) {
+        this.userService.removeWishlistItem(SecurityContextUtil.getCurrentUser().getId(), wishlistId);
+    }
 }

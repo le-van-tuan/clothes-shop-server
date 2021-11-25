@@ -35,9 +35,10 @@ public class ProductVariantEntity {
 
     private boolean deleted;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_variant_id", referencedColumnName = "id")
-    private List<ProductVariantImageEntity> images;
+    @ElementCollection
+    @CollectionTable(name = "ProductVariantImageEntity", joinColumns = @JoinColumn(name = "product_variant_id", nullable = false))
+    @Column(name = "url", nullable = false)
+    private List<String> images;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_variant_id", referencedColumnName = "id")
@@ -104,11 +105,11 @@ public class ProductVariantEntity {
         this.deleted = deleted;
     }
 
-    public List<ProductVariantImageEntity> getImages() {
+    public List<String> getImages() {
         return images;
     }
 
-    public void setImages(List<ProductVariantImageEntity> images) {
+    public void setImages(List<String> images) {
         this.images = images;
     }
 

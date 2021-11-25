@@ -33,4 +33,8 @@ public interface UserService {
      * ADMINS
      */
     List<UserEntity> getAllUsers();
+
+    void addProduct2Wishlist(long userId, long productId);
+
+    void removeWishlistItem(long userId, long wishlistId);
 }

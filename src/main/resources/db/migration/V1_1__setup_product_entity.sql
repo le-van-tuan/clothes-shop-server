@@ -27,6 +27,7 @@ CREATE TABLE products(
     category_id       BIGINT     NOT NULL,
     description TEXT,
     published BOOLEAN  DEFAULT FALSE,
+    deleted BOOLEAN  DEFAULT FALSE,
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
 ALTER TABLE products ADD CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE NO ACTION;
@@ -38,7 +39,7 @@ CREATE TABLE product_images(
     image_url varchar(255),
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE product_images ADD CONSTRAINT fk_product_image_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE NO ACTION;
+ALTER TABLE product_images ADD CONSTRAINT fk_product_image_product FOREIGN KEY (product_id) REFERENCES products(id);
 
 CREATE TABLE product_attributes(
     id  SERIAL  NOT NULL    PRIMARY KEY,
@@ -46,7 +47,7 @@ CREATE TABLE product_attributes(
     attribute_value_id BIGINT     NOT NULL,
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE product_attributes ADD CONSTRAINT fk_product_attribute_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE NO ACTION;
+ALTER TABLE product_attributes ADD CONSTRAINT fk_product_attribute_product FOREIGN KEY (product_id) REFERENCES products(id);
 ALTER TABLE product_attributes ADD CONSTRAINT fk_product_attribute_attribute_value FOREIGN KEY (attribute_value_id) REFERENCES attribute_values(id) ON DELETE NO ACTION;
 
 CREATE TABLE product_variants(
@@ -59,7 +60,7 @@ CREATE TABLE product_variants(
     deleted    BOOLEAN  DEFAULT FALSE,
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE product_variants ADD CONSTRAINT fk_product_variants_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE NO ACTION;
+ALTER TABLE product_variants ADD CONSTRAINT fk_product_variants_product FOREIGN KEY (product_id) REFERENCES products(id);
 
 CREATE TABLE product_variant_images(
     id              SERIAL           NOT NULL      PRIMARY KEY,
