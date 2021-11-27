@@ -86,5 +86,5 @@ CREATE TABLE wishlist(
     created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
 );
 ALTER TABLE wishlist ADD CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE NO ACTION;
-ALTER TABLE wishlist ADD CONSTRAINT fk_wishlist_user FOREIGN KEY (product_id) REFERENCES users(id) ON DELETE NO ACTION;
+ALTER TABLE wishlist ADD CONSTRAINT fk_wishlist_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION;
 
