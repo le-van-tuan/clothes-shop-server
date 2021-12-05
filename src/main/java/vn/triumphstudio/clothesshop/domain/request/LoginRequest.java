@@ -1,12 +1,10 @@
 package vn.triumphstudio.clothesshop.domain.request;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 public class LoginRequest {
 
     @NotBlank
-    @Email
     private String email;
 
     @NotBlank

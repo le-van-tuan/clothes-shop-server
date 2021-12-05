@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface ShippingAddressRepository extends JpaRepository<ShippingAddressEntity, Long> {
-    List<ShippingAddressEntity> findAllByUser_Id(long userId);
+    List<ShippingAddressEntity> findAllByUser_IdOrderByCreatedAtDesc(long userId);
 
     ShippingAddressEntity findFirstByUser_IdAndId(long userId, long addressId);
 

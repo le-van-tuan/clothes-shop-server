@@ -33,6 +33,10 @@ public class UserPrincipal implements UserDetails {
         return this.user.getRole();
     }
 
+    public String getName() {
+        return this.user.getName();
+    }
+
     @Override
     public String getPassword() {
         return this.user.getPassword();

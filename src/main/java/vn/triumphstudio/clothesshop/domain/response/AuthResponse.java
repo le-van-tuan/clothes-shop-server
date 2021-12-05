@@ -11,11 +11,14 @@ public class AuthResponse {
     private String accessToken;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.ROLE_USER;
+    private Role role;
 
-    public AuthResponse(String accessToken, Role role) {
+    private String name;
+
+    public AuthResponse(String accessToken, Role role, String name) {
         this.accessToken = accessToken;
         this.role = role;
+        this.name = name;
     }
 
     public Role getRole() {
@@ -32,5 +35,13 @@ public class AuthResponse {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

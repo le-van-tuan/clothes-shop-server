@@ -7,7 +7,7 @@ spring:
     hikari:
       jdbcUrl: jdbc:postgresql://localhost:5432/clothes_shop
       username: postgres
-      password: raNDbleC934$
+      password: 123456
       connectionTimeout: 30000
       idleTimeout: 600000
       maxLifetime: 1800000

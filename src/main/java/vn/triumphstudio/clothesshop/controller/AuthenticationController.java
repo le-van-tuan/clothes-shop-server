@@ -44,7 +44,7 @@ public class AuthenticationController {
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             String accessToken = jwtTokenProvider.generateAccessToken(userPrincipal);
 
-            return new AuthResponse(accessToken, userPrincipal.getRole());
+            return new AuthResponse(accessToken, userPrincipal.getRole(), userPrincipal.getName());
         } catch (DisabledException e) {
             throw new BadCredentialsException("User has been disabled.");
         }

@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<ShippingAddressEntity> getShippingAddressesByUserId(long userId) {
-        return this.shippingAddressRepository.findAllByUser_Id(userId);
+        return this.shippingAddressRepository.findAllByUser_IdOrderByCreatedAtDesc(userId);
     }
 
     @Override
