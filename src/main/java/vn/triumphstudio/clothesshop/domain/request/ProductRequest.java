@@ -1,11 +1,13 @@
 package vn.triumphstudio.clothesshop.domain.request;
 
-import vn.triumphstudio.clothesshop.domain.enumration.ImageType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductRequest {
 
     @NotBlank
@@ -16,7 +18,11 @@ public class ProductRequest {
 
     private String description;
 
-    private List<ImageRequest> images;
+    @JsonIgnore
+    private MultipartFile thumbnail;
+
+    @JsonIgnore
+    private MultipartFile[] galleries;
 
     private boolean published;
 
@@ -44,12 +50,20 @@ public class ProductRequest {
         this.description = description;
     }
 
-    public List<ImageRequest> getImages() {
-        return images;
+    public MultipartFile getThumbnail() {
+        return thumbnail;
     }
 
-    public void setImages(List<ImageRequest> images) {
-        this.images = images;
+    public void setThumbnail(MultipartFile thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public MultipartFile[] getGalleries() {
+        return galleries;
+    }
+
+    public void setGalleries(MultipartFile[] galleries) {
+        this.galleries = galleries;
     }
 
     public boolean isPublished() {
@@ -58,27 +72,5 @@ public class ProductRequest {
 
     public void setPublished(boolean published) {
         this.published = published;
-    }
-
-    public static class ImageRequest {
-        private String name;
-
-        private ImageType imageType = ImageType.GALLERY;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public ImageType getImageType() {
-            return imageType;
-        }
-
-        public void setImageType(ImageType imageType) {
-            this.imageType = imageType;
-        }
     }
 }

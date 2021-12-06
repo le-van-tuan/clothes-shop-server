@@ -11,7 +11,13 @@ public interface ProductService {
 
     List<CategoryEntity> getAllCategory();
 
+    CategoryEntity getCategoryById(long id);
+
     CategoryEntity addNewCategory(CategoryRequest request);
+
+    CategoryEntity updateCategory(long id, CategoryRequest request);
+
+    void deleteCategory(long id);
 
     List<ProductEntity> getAllProduct();
 

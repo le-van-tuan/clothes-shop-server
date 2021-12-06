@@ -11,6 +11,8 @@ public class CategoryRequest {
 
     private long parent;
 
+    private boolean enabled;
+
     public String getName() {
         return name;
     }
@@ -33,5 +35,13 @@ public class CategoryRequest {
 
     public void setParent(long parent) {
         this.parent = parent;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
