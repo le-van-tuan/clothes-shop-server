@@ -1,6 +1,9 @@
 package vn.triumphstudio.clothesshop.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +80,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductEntity> getNewArrivals() {
+        Pageable sortedByTime = PageRequest.of(0, 5, Sort.by("createdAt").descending());
+        return this.productRepository.findAll(sortedByTime).getContent();
+    }
+
+    @Override
     public ProductEntity getProductById(long productId) {
         return this.productRepository.findById(productId).orElseThrow(() -> new BusinessLogicException("No product found with id = " + productId));
     }
@@ -88,7 +97,7 @@ public class ProductServiceImpl implements ProductService {
 
         product.setName(request.getName());
         product.setCategory(this.getCategoryById(request.getCategory()));
-        product.setPublished(request.isPublished());
+        product.setPublished(false);
         product.setDescription(request.getDescription());
 
         List<ProductImageEntity> productImages = new ArrayList<>();
@@ -111,6 +120,17 @@ public class ProductServiceImpl implements ProductService {
 
         product.setImages(productImages);
         return this.productRepository.save(product);
+    }
+
+    @Override
+    public void publishProduct(long productId) {
+        ProductEntity product = this.getProductById(productId);
+        if (product.isPublished()) throw new BusinessLogicException("Product has already published!");
+        if (product.isDeleted()) throw new BusinessLogicException("Product was deleted, it can not publish");
+        if (product.getVariants().isEmpty())
+            throw new BusinessLogicException("Product must has one variant to publish");
+        product.setPublished(true);
+        this.productRepository.save(product);
     }
 
     @Override

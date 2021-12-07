@@ -85,6 +85,11 @@ public class AdminController {
         return this.productService.addNewProduct(request);
     }
 
+    @GetMapping(value = "/products/{id}/publish")
+    public void publishProduct(@PathVariable long id) {
+        this.productService.publishProduct(id);
+    }
+
     @DeleteMapping("/products/{id}")
     public void deleteProduct(@PathVariable long id) {
         this.productService.deleteProduct(id);

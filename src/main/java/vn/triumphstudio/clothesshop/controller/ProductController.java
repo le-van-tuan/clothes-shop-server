@@ -30,6 +30,11 @@ public class ProductController {
         return this.productService.getAllProduct();
     }
 
+    @GetMapping("/new-arrivals")
+    public List<ProductEntity> getNewArrivals() {
+        return this.productService.getNewArrivals();
+    }
+
     @GetMapping("/categories")
     public List<CategoryEntity> getAllCategory() {
         return this.productService.getAllCategory();

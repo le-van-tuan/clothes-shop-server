@@ -24,8 +24,6 @@ public class ProductRequest {
     @JsonIgnore
     private MultipartFile[] galleries;
 
-    private boolean published;
-
     public String getName() {
         return name;
     }
@@ -64,13 +62,5 @@ public class ProductRequest {
 
     public void setGalleries(MultipartFile[] galleries) {
         this.galleries = galleries;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
     }
 }

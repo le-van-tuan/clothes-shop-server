@@ -21,9 +21,13 @@ public interface ProductService {
 
     List<ProductEntity> getAllProduct();
 
+    List<ProductEntity> getNewArrivals();
+
     ProductEntity getProductById(long productId);
 
     ProductEntity addNewProduct(ProductRequest request);
+
+    void publishProduct(long productId);
 
     void deleteProduct(long id);
 }

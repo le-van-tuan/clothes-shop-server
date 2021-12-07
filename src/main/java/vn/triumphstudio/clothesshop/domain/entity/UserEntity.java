@@ -40,7 +40,6 @@ public class UserEntity {
     @Column(name = "enabled")
     private boolean enabled = true;
 
-    @JsonIgnore
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role = Role.ROLE_USER;
