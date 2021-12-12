@@ -24,6 +24,7 @@ public class AttributeValueEntity {
 
     private String value;
 
+    @JsonIgnore
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

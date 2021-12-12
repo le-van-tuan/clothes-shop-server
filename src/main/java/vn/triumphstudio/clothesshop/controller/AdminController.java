@@ -6,9 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.triumphstudio.clothesshop.domain.annotation.AllowAdmin;
-import vn.triumphstudio.clothesshop.domain.entity.CategoryEntity;
-import vn.triumphstudio.clothesshop.domain.entity.ProductEntity;
-import vn.triumphstudio.clothesshop.domain.entity.UserEntity;
+import vn.triumphstudio.clothesshop.domain.entity.*;
+import vn.triumphstudio.clothesshop.domain.model.AttributesInfo;
 import vn.triumphstudio.clothesshop.domain.request.CategoryRequest;
 import vn.triumphstudio.clothesshop.domain.request.ProductRequest;
 import vn.triumphstudio.clothesshop.domain.response.FileUploadResponse;
@@ -98,5 +97,23 @@ public class AdminController {
     @PostMapping("/file-management/images/upload")
     public FileUploadResponse uploadProductImage(@RequestParam("file") MultipartFile file) {
         return fileStorageService.uploadFile(file);
+    }
+
+    /**
+     * Attributes
+     */
+    @GetMapping("/attributes")
+    public AttributesInfo getAllAttributes() {
+        return this.productService.getAllAttributes();
+    }
+
+    @PostMapping("/attributes")
+    public AttributeEntity createAttribute(@RequestBody AttributeEntity request) {
+        return this.productService.createAttribute(request);
+    }
+
+    @PostMapping("/attributes/values/{id}")
+    public AttributeValueEntity createAttributeValue(@PathVariable("id") long attributeId, @RequestBody AttributeValueEntity value) {
+        return this.productService.createAttributeValue(attributeId, value);
     }
 }

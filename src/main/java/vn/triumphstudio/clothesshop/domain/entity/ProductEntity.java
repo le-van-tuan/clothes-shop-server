@@ -1,6 +1,7 @@
 package vn.triumphstudio.clothesshop.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -26,6 +27,11 @@ public class ProductEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private List<ProductImageEntity> images;
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    private List<ProductAttributeEntity> productAttributes;
 
     @OneToMany(fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
@@ -74,6 +80,14 @@ public class ProductEntity {
 
     public void setImages(List<ProductImageEntity> images) {
         this.images = images;
+    }
+
+    public List<ProductAttributeEntity> getProductAttributes() {
+        return productAttributes;
+    }
+
+    public void setProductAttributes(List<ProductAttributeEntity> productAttributes) {
+        this.productAttributes = productAttributes;
     }
 
     public List<ProductVariantEntity> getVariants() {

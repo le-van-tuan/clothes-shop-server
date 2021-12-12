@@ -1,6 +1,8 @@
 package vn.triumphstudio.clothesshop.service.impl;
 
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,21 @@ import java.util.UUID;
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
-    private final Path rootLocation = Paths.get(Const.FILE_UPLOAD_DIR);
+    private final Path rootLocation;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageServiceImpl.class);
+
+    public FileStorageServiceImpl() {
+        this.rootLocation = Paths.get(Const.FILE_UPLOAD_DIR);
+        if (!Files.exists(this.rootLocation)) {
+            try {
+                Files.createDirectories(this.rootLocation);
+            } catch (IOException e) {
+                e.printStackTrace();
+                LOGGER.error("Failed to create directory with path:  " + this.rootLocation.toAbsolutePath());
+            }
+        }
+    }
 
     @Override
     public FileUploadResponse uploadFile(MultipartFile file) {

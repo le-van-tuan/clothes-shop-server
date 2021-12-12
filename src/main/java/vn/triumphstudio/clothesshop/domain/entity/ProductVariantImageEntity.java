@@ -18,8 +18,9 @@ public class ProductVariantImageEntity {
     private long id;
 
     @JsonIgnore
-    @Column(name = "product_variant_id")
-    private long productVariantId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id", nullable = false)
+    private ProductVariantEntity productVariant;
 
     @Column(name = "image_url")
     private String url;
@@ -36,12 +37,12 @@ public class ProductVariantImageEntity {
         this.id = id;
     }
 
-    public long getProductVariantId() {
-        return productVariantId;
+    public ProductVariantEntity getProductVariant() {
+        return productVariant;
     }
 
-    public void setProductVariantId(long productVariantId) {
-        this.productVariantId = productVariantId;
+    public void setProductVariant(ProductVariantEntity productVariant) {
+        this.productVariant = productVariant;
     }
 
     public String getUrl() {

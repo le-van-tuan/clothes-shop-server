@@ -27,6 +27,7 @@ public class ProductAttributeEntity {
     @JoinColumn(name = "attribute_value_id", nullable = false)
     private AttributeValueEntity attributeValue;
 
+    @JsonIgnore
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

@@ -3,9 +3,11 @@ package vn.triumphstudio.clothesshop.domain.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.web.multipart.MultipartFile;
+import vn.triumphstudio.clothesshop.domain.model.AttributeItem;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductRequest {
@@ -23,6 +25,8 @@ public class ProductRequest {
 
     @JsonIgnore
     private MultipartFile[] galleries;
+
+    private List<AttributeItem> specifications;
 
     public String getName() {
         return name;
@@ -62,5 +66,13 @@ public class ProductRequest {
 
     public void setGalleries(MultipartFile[] galleries) {
         this.galleries = galleries;
+    }
+
+    public List<AttributeItem> getSpecifications() {
+        return specifications;
+    }
+
+    public void setSpecifications(List<AttributeItem> specifications) {
+        this.specifications = specifications;
     }
 }

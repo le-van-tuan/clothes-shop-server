@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.triumphstudio.clothesshop.domain.entity.CategoryEntity;
 import vn.triumphstudio.clothesshop.domain.entity.ProductEntity;
+import vn.triumphstudio.clothesshop.domain.response.ProductDetail;
 import vn.triumphstudio.clothesshop.service.FileStorageService;
 import vn.triumphstudio.clothesshop.service.ProductService;
 
@@ -26,7 +27,7 @@ public class ProductController {
     private FileStorageService fileStorageService;
 
     @GetMapping
-    public List<ProductEntity> getAllProduct() {
+    public List<ProductDetail> getAllProduct() {
         return this.productService.getAllProduct();
     }
 

@@ -1,5 +1,6 @@
 package vn.triumphstudio.clothesshop.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -19,11 +20,12 @@ public class AttributeEntity {
 
     private String name;
 
-    @ElementCollection
-    @CollectionTable(name = "AttributeValueEntity", joinColumns = @JoinColumn(name = "attribute_id", nullable = false))
-    @Column(name = "value", nullable = false)
-    private List<String> values;
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "attribute_id", referencedColumnName = "id")
+    private List<AttributeValueEntity> values;
 
+    @JsonIgnore
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -44,11 +46,11 @@ public class AttributeEntity {
         this.name = name;
     }
 
-    public List<String> getValues() {
+    public List<AttributeValueEntity> getValues() {
         return values;
     }
 
-    public void setValues(List<String> values) {
+    public void setValues(List<AttributeValueEntity> values) {
         this.values = values;
     }
 
