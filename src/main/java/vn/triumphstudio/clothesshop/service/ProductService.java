@@ -1,12 +1,11 @@
 package vn.triumphstudio.clothesshop.service;
 
-import vn.triumphstudio.clothesshop.domain.entity.AttributeEntity;
-import vn.triumphstudio.clothesshop.domain.entity.AttributeValueEntity;
-import vn.triumphstudio.clothesshop.domain.entity.CategoryEntity;
-import vn.triumphstudio.clothesshop.domain.entity.ProductEntity;
+import org.springframework.data.domain.Page;
+import vn.triumphstudio.clothesshop.domain.entity.*;
 import vn.triumphstudio.clothesshop.domain.model.AttributesInfo;
 import vn.triumphstudio.clothesshop.domain.request.ProductRequest;
 import vn.triumphstudio.clothesshop.domain.request.CategoryRequest;
+import vn.triumphstudio.clothesshop.domain.request.VariantRequest;
 import vn.triumphstudio.clothesshop.domain.response.ProductDetail;
 
 import java.util.List;
@@ -25,7 +24,9 @@ public interface ProductService {
 
     List<ProductDetail> getAllProduct();
 
-    List<ProductEntity> getNewArrivals();
+    Page<ProductEntity> filterProducts(int page, int size, List<Long> categories, Boolean published);
+
+    List<ProductEntity> getNewArrivals(int size);
 
     ProductEntity getProductById(long productId);
 
@@ -40,4 +41,8 @@ public interface ProductService {
     AttributeValueEntity createAttributeValue(long attributeId, AttributeValueEntity value);
 
     AttributesInfo getAllAttributes();
+
+    ProductVariantEntity addProductVariant(VariantRequest variantRequest);
+
+    void deleteProductVariants(long variantId);
 }

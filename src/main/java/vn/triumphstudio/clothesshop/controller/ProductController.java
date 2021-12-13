@@ -4,13 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.triumphstudio.clothesshop.domain.entity.CategoryEntity;
 import vn.triumphstudio.clothesshop.domain.entity.ProductEntity;
-import vn.triumphstudio.clothesshop.domain.response.ProductDetail;
 import vn.triumphstudio.clothesshop.service.FileStorageService;
 import vn.triumphstudio.clothesshop.service.ProductService;
 
@@ -26,14 +22,9 @@ public class ProductController {
     @Autowired
     private FileStorageService fileStorageService;
 
-    @GetMapping
-    public List<ProductDetail> getAllProduct() {
-        return this.productService.getAllProduct();
-    }
-
     @GetMapping("/new-arrivals")
-    public List<ProductEntity> getNewArrivals() {
-        return this.productService.getNewArrivals();
+    public List<ProductEntity> getNewArrivals(@RequestParam(value = "size") int size) {
+        return this.productService.getNewArrivals(size);
     }
 
     @GetMapping("/categories")

@@ -14,7 +14,6 @@ import vn.triumphstudio.clothesshop.domain.request.SignUpRequest;
 import vn.triumphstudio.clothesshop.domain.request.UserProfileRequest;
 import vn.triumphstudio.clothesshop.exception.BadRequestException;
 import vn.triumphstudio.clothesshop.exception.BusinessLogicException;
-import vn.triumphstudio.clothesshop.repository.ProductRepository;
 import vn.triumphstudio.clothesshop.repository.ShippingAddressRepository;
 import vn.triumphstudio.clothesshop.repository.UserRepository;
 import vn.triumphstudio.clothesshop.repository.WishlistRepository;
@@ -55,6 +54,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity toggleUserStatus(long userId) {
         UserEntity user = this.getUserById(userId);
+        if (user.getRole().equals(Role.ROLE_ADMIN)) {
+            throw new BusinessLogicException("Can not change admin status");
+        }
         user.setEnabled(!user.isEnabled());
         return this.userRepository.save(user);
     }

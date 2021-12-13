@@ -1,11 +1,14 @@
 package vn.triumphstudio.clothesshop.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import vn.triumphstudio.clothesshop.domain.entity.*;
 import vn.triumphstudio.clothesshop.domain.enumration.ImageType;
@@ -13,15 +16,14 @@ import vn.triumphstudio.clothesshop.domain.model.AttributeItem;
 import vn.triumphstudio.clothesshop.domain.model.AttributesInfo;
 import vn.triumphstudio.clothesshop.domain.request.CategoryRequest;
 import vn.triumphstudio.clothesshop.domain.request.ProductRequest;
+import vn.triumphstudio.clothesshop.domain.request.VariantRequest;
 import vn.triumphstudio.clothesshop.domain.response.FileUploadResponse;
 import vn.triumphstudio.clothesshop.domain.response.ProductDetail;
 import vn.triumphstudio.clothesshop.exception.BusinessLogicException;
-import vn.triumphstudio.clothesshop.repository.AttributeRepository;
-import vn.triumphstudio.clothesshop.repository.AttributeValueRepository;
-import vn.triumphstudio.clothesshop.repository.CategoryRepository;
-import vn.triumphstudio.clothesshop.repository.ProductRepository;
+import vn.triumphstudio.clothesshop.repository.*;
 import vn.triumphstudio.clothesshop.service.FileStorageService;
 import vn.triumphstudio.clothesshop.service.ProductService;
+import vn.triumphstudio.clothesshop.specifications.ProductSpecification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private AttributeValueRepository attributeValueRepository;
+
+    @Autowired
+    private ProductVariantRepository productVariantRepository;
 
     @Override
     public List<CategoryEntity> getAllCategory() {
@@ -86,25 +91,45 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDetail> getAllProduct() {
-        List<ProductDetail> result = new ArrayList<>();
-        List<ProductEntity> productEntities = this.productRepository.findAll();
+        List<ProductEntity> productEntities = this.filterProducts(0, Integer.MAX_VALUE, null, null).getContent();
+        return this.parseProduct2ProductDetails(productEntities);
+    }
 
+    private List<ProductDetail> parseProduct2ProductDetails(List<ProductEntity> productEntities) {
+        List<ProductDetail> result = new ArrayList<>();
         for (ProductEntity productEntity : productEntities) {
             ProductDetail detail = new ProductDetail(productEntity);
+
             List<AttributeItem> attributes = new ArrayList<>();
             for (ProductAttributeEntity productAttribute : productEntity.getProductAttributes()) {
                 attributes.add(new AttributeItem(productAttribute.getAttributeValue().getAttribute().getName(), productAttribute.getAttributeValue().getValue()));
             }
             detail.setSpecifications(attributes);
+
+            List<ProductVariantEntity> variants = productEntity.getVariants().stream().filter(productVariantEntity -> !productVariantEntity.isDeleted()).collect(Collectors.toList());
+            detail.setVariants(variants);
+
             result.add(detail);
         }
         return result;
     }
 
     @Override
-    public List<ProductEntity> getNewArrivals() {
-        Pageable sortedByTime = PageRequest.of(0, 5, Sort.by("createdAt").descending());
-        return this.productRepository.findAll(sortedByTime).getContent();
+    public Page<ProductEntity> filterProducts(int page, int size, List<Long> categories, Boolean published) {
+        if (size <= 0) size = Integer.MAX_VALUE;
+        Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
+
+        Specification<ProductEntity> productSpecs = ProductSpecification.byDeletedStatus(false)
+                .and(ProductSpecification.byPublishedStatus(published))
+                .and(ProductSpecification.byCategories(categories));
+
+        return this.productRepository.findAll(productSpecs, pageable);
+    }
+
+    @Override
+    public List<ProductEntity> getNewArrivals(int size) {
+        if (size <= 0) size = 5;
+        return this.filterProducts(0, size, null, true).getContent();
     }
 
     @Override
@@ -158,7 +183,8 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity product = this.getProductById(productId);
         if (product.isPublished()) throw new BusinessLogicException("Product has already published!");
         if (product.isDeleted()) throw new BusinessLogicException("Product was deleted, it can not publish");
-        if (product.getVariants().isEmpty())
+        List<ProductVariantEntity> variants = product.getVariants().stream().filter(productVariantEntity -> !productVariantEntity.isDeleted()).collect(Collectors.toList());
+        if (variants.isEmpty())
             throw new BusinessLogicException("Product must has one variant to publish");
         product.setPublished(true);
         this.productRepository.save(product);
@@ -196,5 +222,52 @@ public class ProductServiceImpl implements ProductService {
         attributesInfo.setAttributeValues(this.attributeRepository.findAll().stream().collect(Collectors.toMap(AttributeEntity::getId, AttributeEntity::getValues)));
 
         return attributesInfo;
+    }
+
+    @Override
+    @Transactional
+    public ProductVariantEntity addProductVariant(VariantRequest request) {
+        ProductEntity product = this.getProductById(request.getProductId());
+        if (product == null) {
+            throw new BusinessLogicException("Can not find any product with id = " + request.getProductId());
+        }
+
+        ProductVariantEntity variant = new ProductVariantEntity();
+        variant.setProduct(product);
+        variant.setVariantName(StringUtils.isEmpty(request.getName()) ? product.getName() : request.getName());
+        variant.setCost(request.getCost());
+        variant.setPrice(request.getPrice());
+        variant.setStock(request.getStock());
+        variant.setDeleted(false);
+
+        List<ProductVariantImageEntity> galleries = new ArrayList<>();
+        for (MultipartFile gallery : request.getGalleries()) {
+            FileUploadResponse uploaded = this.fileStorageService.uploadFile(gallery);
+
+            ProductVariantImageEntity variantImage = new ProductVariantImageEntity();
+            variantImage.setProductVariant(variant);
+            variantImage.setUrl(uploaded.getFileName());
+            galleries.add(variantImage);
+        }
+        variant.setImages(galleries);
+
+        List<ProductVariantOptionEntity> productVariantOptions = new ArrayList<>();
+        for (AttributeItem attributeItem : request.getOptions()) {
+            ProductVariantOptionEntity option = new ProductVariantOptionEntity();
+            String value = attributeItem.getValue().toString();
+            option.setAttributeValue(this.attributeValueRepository.getOne(Long.valueOf(value)));
+            option.setProductVariant(variant);
+            productVariantOptions.add(option);
+        }
+        variant.setVariantOptions(productVariantOptions);
+
+        return this.productVariantRepository.save(variant);
+    }
+
+    @Override
+    public void deleteProductVariants(long variantId) {
+        ProductVariantEntity variant = this.productVariantRepository.getOne(variantId);
+        variant.setDeleted(true);
+        this.productVariantRepository.save(variant);
     }
 }

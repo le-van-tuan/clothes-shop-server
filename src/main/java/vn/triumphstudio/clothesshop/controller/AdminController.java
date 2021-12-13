@@ -10,7 +10,9 @@ import vn.triumphstudio.clothesshop.domain.entity.*;
 import vn.triumphstudio.clothesshop.domain.model.AttributesInfo;
 import vn.triumphstudio.clothesshop.domain.request.CategoryRequest;
 import vn.triumphstudio.clothesshop.domain.request.ProductRequest;
+import vn.triumphstudio.clothesshop.domain.request.VariantRequest;
 import vn.triumphstudio.clothesshop.domain.response.FileUploadResponse;
+import vn.triumphstudio.clothesshop.domain.response.ProductDetail;
 import vn.triumphstudio.clothesshop.service.FileStorageService;
 import vn.triumphstudio.clothesshop.service.ProductService;
 import vn.triumphstudio.clothesshop.service.UserService;
@@ -76,12 +78,29 @@ public class AdminController {
      *
      * @return
      */
+    @GetMapping("/products")
+    public List<ProductDetail> getAllProduct() {
+        return this.productService.getAllProduct();
+    }
+
     @PostMapping(value = "/products", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ProductEntity addNewProduct(@RequestParam("product") String product, @RequestParam("thumbnail") MultipartFile thumbnail, @RequestParam(value = "galleries", required = false) MultipartFile[] galleries) throws IOException {
         ProductRequest request = this.objectMapper.readValue(product, ProductRequest.class);
         request.setThumbnail(thumbnail);
         request.setGalleries(galleries);
         return this.productService.addNewProduct(request);
+    }
+
+    @PostMapping(value = "/products/variants", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ProductVariantEntity addProductVariant(@RequestParam("variant") String variant, @RequestParam(value = "galleries") MultipartFile[] galleries) throws IOException {
+        VariantRequest variantRequest = this.objectMapper.readValue(variant, VariantRequest.class);
+        variantRequest.setGalleries(galleries);
+        return this.productService.addProductVariant(variantRequest);
+    }
+
+    @DeleteMapping("/products/variants/{id}")
+    public void deleteProductVariant(@PathVariable("id") long variantId) {
+        this.productService.deleteProductVariants(variantId);
     }
 
     @GetMapping(value = "/products/{id}/publish")

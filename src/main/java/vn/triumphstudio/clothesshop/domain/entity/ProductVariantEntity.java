@@ -36,10 +36,10 @@ public class ProductVariantEntity {
     private boolean deleted;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    @JoinColumn(name = "product_variant_id", referencedColumnName = "id")
     private List<ProductVariantImageEntity> images;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_variant_id", referencedColumnName = "id")
     private List<ProductVariantOptionEntity> variantOptions;
 

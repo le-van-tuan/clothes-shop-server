@@ -19,7 +19,7 @@ public class ProductVariantImageEntity {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_variant_id", nullable = false)
     private ProductVariantEntity productVariant;
 
     @Column(name = "image_url")
