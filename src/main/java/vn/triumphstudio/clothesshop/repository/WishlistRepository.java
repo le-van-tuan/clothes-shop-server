@@ -7,5 +7,7 @@ import vn.triumphstudio.clothesshop.domain.entity.WishlistEntity;
 @Repository
 public interface WishlistRepository extends JpaRepository<WishlistEntity, Long> {
 
+    WishlistEntity findFirstByUser_IdAndProduct_Id(long userId, long productId);
+
     WishlistEntity findFirstByUser_IdAndId(long userId, long wishlistId);
 }

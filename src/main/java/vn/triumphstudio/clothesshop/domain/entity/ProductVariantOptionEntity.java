@@ -29,6 +29,7 @@ public class ProductVariantOptionEntity {
 
     @Column(name = "created_at")
     @CreationTimestamp
+    @JsonIgnore
     private LocalDateTime createdAt;
 
     public long getId() {

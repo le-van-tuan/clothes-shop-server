@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.triumphstudio.clothesshop.domain.entity.CategoryEntity;
 import vn.triumphstudio.clothesshop.domain.entity.ProductEntity;
+import vn.triumphstudio.clothesshop.domain.response.ProductDetail;
 import vn.triumphstudio.clothesshop.service.FileStorageService;
 import vn.triumphstudio.clothesshop.service.ProductService;
 
@@ -21,6 +22,11 @@ public class ProductController {
 
     @Autowired
     private FileStorageService fileStorageService;
+
+    @GetMapping("/{id}")
+    public ProductDetail getProductDetails(@PathVariable long id) {
+        return this.productService.getProductDetailsById(id);
+    }
 
     @GetMapping("/new-arrivals")
     public List<ProductEntity> getNewArrivals(@RequestParam(value = "size") int size) {

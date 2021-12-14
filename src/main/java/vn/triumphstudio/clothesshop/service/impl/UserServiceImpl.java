@@ -144,6 +144,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addProduct2Wishlist(long userId, long productId) {
+        WishlistEntity existed = this.wishlistRepository.findFirstByUser_IdAndProduct_Id(userId, productId);
+        if (existed != null) throw new BusinessLogicException("Item has already existed in wishlist.");
+
         ProductEntity product = this.productService.getProductById(productId);
         UserEntity user = this.getUserById(userId);
 

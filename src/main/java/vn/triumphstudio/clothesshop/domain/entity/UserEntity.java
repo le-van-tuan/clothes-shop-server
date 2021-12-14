@@ -112,4 +112,12 @@ public class UserEntity {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    public List<WishlistEntity> getWishlist() {
+        return wishlist;
+    }
+
+    public void setWishlist(List<WishlistEntity> wishlist) {
+        this.wishlist = wishlist;
+    }
 }

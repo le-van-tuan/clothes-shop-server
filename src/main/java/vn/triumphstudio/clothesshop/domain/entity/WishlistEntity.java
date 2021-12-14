@@ -23,7 +23,6 @@ public class WishlistEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private ProductEntity product;

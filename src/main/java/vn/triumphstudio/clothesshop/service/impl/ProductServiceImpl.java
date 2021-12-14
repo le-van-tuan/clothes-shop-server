@@ -92,26 +92,28 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDetail> getAllProduct() {
         List<ProductEntity> productEntities = this.filterProducts(0, Integer.MAX_VALUE, null, null).getContent();
-        return this.parseProduct2ProductDetails(productEntities);
+        return productEntities.stream().map(this::parseProduct2ProductDetails).collect(Collectors.toList());
     }
 
-    private List<ProductDetail> parseProduct2ProductDetails(List<ProductEntity> productEntities) {
-        List<ProductDetail> result = new ArrayList<>();
-        for (ProductEntity productEntity : productEntities) {
-            ProductDetail detail = new ProductDetail(productEntity);
+    @Override
+    public ProductDetail getProductDetailsById(long id) {
+        ProductEntity product = this.getProductById(id);
+        return this.parseProduct2ProductDetails(product);
+    }
 
-            List<AttributeItem> attributes = new ArrayList<>();
-            for (ProductAttributeEntity productAttribute : productEntity.getProductAttributes()) {
-                attributes.add(new AttributeItem(productAttribute.getAttributeValue().getAttribute().getName(), productAttribute.getAttributeValue().getValue()));
-            }
-            detail.setSpecifications(attributes);
+    private ProductDetail parseProduct2ProductDetails(ProductEntity productEntity) {
+        ProductDetail detail = new ProductDetail(productEntity);
 
-            List<ProductVariantEntity> variants = productEntity.getVariants().stream().filter(productVariantEntity -> !productVariantEntity.isDeleted()).collect(Collectors.toList());
-            detail.setVariants(variants);
-
-            result.add(detail);
+        List<AttributeItem> specifications = new ArrayList<>();
+        for (ProductAttributeEntity productAttribute : productEntity.getProductAttributes()) {
+            specifications.add(new AttributeItem(productAttribute.getAttributeValue().getAttribute().getName(), productAttribute.getAttributeValue().getValue()));
         }
-        return result;
+        detail.setSpecifications(specifications);
+
+        List<ProductVariantEntity> variants = productEntity.getVariants().stream().filter(productVariantEntity -> !productVariantEntity.isDeleted()).collect(Collectors.toList());
+        detail.setVariants(variants);
+
+        return detail;
     }
 
     @Override
