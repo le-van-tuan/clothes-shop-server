@@ -14,6 +14,8 @@ import vn.triumphstudio.clothesshop.domain.entity.*;
 import vn.triumphstudio.clothesshop.domain.enumration.ImageType;
 import vn.triumphstudio.clothesshop.domain.model.AttributeItem;
 import vn.triumphstudio.clothesshop.domain.model.AttributesInfo;
+import vn.triumphstudio.clothesshop.domain.model.OptionInfo;
+import vn.triumphstudio.clothesshop.domain.model.TierVariation;
 import vn.triumphstudio.clothesshop.domain.request.CategoryRequest;
 import vn.triumphstudio.clothesshop.domain.request.ProductRequest;
 import vn.triumphstudio.clothesshop.domain.request.VariantRequest;
@@ -25,10 +27,10 @@ import vn.triumphstudio.clothesshop.service.FileStorageService;
 import vn.triumphstudio.clothesshop.service.ProductService;
 import vn.triumphstudio.clothesshop.specifications.ProductSpecification;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -112,8 +114,50 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductVariantEntity> variants = productEntity.getVariants().stream().filter(productVariantEntity -> !productVariantEntity.isDeleted()).collect(Collectors.toList());
         detail.setVariants(variants);
+        detail.setTierVariations(this.getListTierFromVariants(variants));
 
         return detail;
+    }
+
+    private List<TierVariation> getListTierFromVariants(List<ProductVariantEntity> variants) {
+        List<ProductVariantOptionEntity> variantOptionEntities = new ArrayList<>();
+        for (ProductVariantEntity variant : variants) {
+            variantOptionEntities.addAll(variant.getVariantOptions());
+        }
+
+        Map<Long, List<TierVariation>> tierMap = new HashMap<>();
+        for (ProductVariantOptionEntity variantOption : variantOptionEntities) {
+            TierVariation tierVariation = new TierVariation();
+            long key = variantOption.getAttributeValue().getAttribute().getId();
+            tierVariation.setId(key);
+            tierVariation.setName(variantOption.getAttributeValue().getAttribute().getName());
+            tierVariation.setOptions(Collections.singletonList(new OptionInfo(variantOption.getAttributeValue().getId(), variantOption.getAttributeValue().getValue())));
+
+            if (tierMap.containsKey(key)) {
+                tierMap.get(key).add(tierVariation);
+            } else {
+                List<TierVariation> item = new ArrayList<>();
+                item.add(tierVariation);
+                tierMap.put(key, item);
+            }
+        }
+
+        List<TierVariation> finalTier = new ArrayList<>();
+        for (Map.Entry<Long, List<TierVariation>> longListEntry : tierMap.entrySet()) {
+            TierVariation tierVariation = new TierVariation();
+            tierVariation.setId(longListEntry.getKey());
+            tierVariation.setName(longListEntry.getValue().get(0).getName());
+
+            List<OptionInfo> list = new ArrayList<>();
+            for (TierVariation variation : longListEntry.getValue()) {
+                list.addAll(variation.getOptions());
+            }
+            tierVariation.setOptions(list);
+
+            finalTier.add(tierVariation);
+        }
+
+        return finalTier;
     }
 
     @Override
