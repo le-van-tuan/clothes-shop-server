@@ -28,9 +28,7 @@ import vn.triumphstudio.clothesshop.service.ProductService;
 import vn.triumphstudio.clothesshop.specifications.ProductSpecification;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -87,8 +85,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteCategory(long id) {
-        CategoryEntity category = this.getCategoryById(id);
-        this.categoryRepository.delete(category);
+        try {
+            CategoryEntity category = this.getCategoryById(id);
+            this.categoryRepository.delete(category);
+        } catch (Exception exception) {
+            throw new BusinessLogicException("Can not delete this category");
+        }
     }
 
     @Override
@@ -112,7 +114,11 @@ public class ProductServiceImpl implements ProductService {
         }
         detail.setSpecifications(specifications);
 
-        List<ProductVariantEntity> variants = productEntity.getVariants().stream().filter(productVariantEntity -> !productVariantEntity.isDeleted()).collect(Collectors.toList());
+        List<ProductVariantEntity> variants = productEntity.getVariants()
+                .stream()
+                .filter(productVariantEntity -> !productVariantEntity.isDeleted())
+                .sorted((Comparator.comparing(ProductVariantEntity::getCreatedAt)))
+                .collect(Collectors.toList());
         detail.setVariants(variants);
         detail.setTierVariations(this.getListTierFromVariants(variants));
 
@@ -315,5 +321,10 @@ public class ProductServiceImpl implements ProductService {
         ProductVariantEntity variant = this.productVariantRepository.getOne(variantId);
         variant.setDeleted(true);
         this.productVariantRepository.save(variant);
+    }
+
+    @Override
+    public ProductVariantEntity getProductVariantById(long variantId) {
+        return this.productVariantRepository.findById(variantId).orElseThrow(() -> new BusinessLogicException("No variant found with id = " + variantId));
     }
 }
