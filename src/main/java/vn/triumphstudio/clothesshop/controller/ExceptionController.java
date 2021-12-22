@@ -29,6 +29,6 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
         response.setSuccess(false);
         response.setMessage(ex.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

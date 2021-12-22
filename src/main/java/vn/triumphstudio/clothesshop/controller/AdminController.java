@@ -3,10 +3,12 @@ package vn.triumphstudio.clothesshop.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.triumphstudio.clothesshop.domain.annotation.AllowAdmin;
 import vn.triumphstudio.clothesshop.domain.entity.*;
+import vn.triumphstudio.clothesshop.domain.enumration.OrderStatus;
 import vn.triumphstudio.clothesshop.domain.model.AttributesInfo;
 import vn.triumphstudio.clothesshop.domain.request.CategoryRequest;
 import vn.triumphstudio.clothesshop.domain.request.ProductRequest;
@@ -14,6 +16,7 @@ import vn.triumphstudio.clothesshop.domain.request.VariantRequest;
 import vn.triumphstudio.clothesshop.domain.response.FileUploadResponse;
 import vn.triumphstudio.clothesshop.domain.response.ProductDetail;
 import vn.triumphstudio.clothesshop.service.FileStorageService;
+import vn.triumphstudio.clothesshop.service.OrderService;
 import vn.triumphstudio.clothesshop.service.ProductService;
 import vn.triumphstudio.clothesshop.service.UserService;
 
@@ -37,6 +40,9 @@ public class AdminController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private OrderService orderService;
 
     /**
      * USERS
@@ -134,5 +140,15 @@ public class AdminController {
     @PostMapping("/attributes/values/{id}")
     public AttributeValueEntity createAttributeValue(@PathVariable("id") long attributeId, @RequestBody AttributeValueEntity value) {
         return this.productService.createAttributeValue(attributeId, value);
+    }
+
+    @GetMapping("/orders")
+    public List<OrderEntity> getAllOrders() {
+        return this.orderService.getAllOrders();
+    }
+
+    @PatchMapping("/orders/{id}/{status}")
+    public void changeOrderStatus(@PathVariable long id, @PathVariable OrderStatus status) {
+        this.orderService.changeOrderStatus(id, status);
     }
 }

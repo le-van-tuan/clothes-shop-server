@@ -1,6 +1,7 @@
 package vn.triumphstudio.clothesshop.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.triumphstudio.clothesshop.domain.entity.OrderEntity;
@@ -15,6 +16,7 @@ import vn.triumphstudio.clothesshop.repository.OrderRepository;
 import vn.triumphstudio.clothesshop.service.OrderService;
 import vn.triumphstudio.clothesshop.service.ProductService;
 import vn.triumphstudio.clothesshop.service.UserService;
+import vn.triumphstudio.clothesshop.util.SecurityContextUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderEntity> getUserOrders(long userId) {
-        return this.orderRepository.findAllByUser_Id(userId);
+        return this.orderRepository.findAllByUser_IdOrderByCreatedAtDesc(userId);
     }
 
     @Override
@@ -99,6 +101,8 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessLogicException("Order was Declined, you can not cancel");
         if (OrderStatus.Shipped.equals(order.getOrderStatus()))
             throw new BusinessLogicException("Order was Shipped, you can not cancel");
+        if (OrderStatus.Completed.equals(order.getOrderStatus()))
+            throw new BusinessLogicException("Order was Completed, you can not cancel");
 
         order.setOrderStatus(OrderStatus.Cancelled);
         return this.orderRepository.save(order);
@@ -107,5 +111,25 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderEntity getOrderById(long orderId) {
         return this.orderRepository.findById(orderId).orElseThrow(() -> new BusinessLogicException("No order found with id = " + orderId));
+    }
+
+    @Override
+    public List<OrderEntity> getAllOrders() {
+        Sort sort = Sort.by("createdAt").descending();
+        return this.orderRepository.findAll(sort);
+    }
+
+    @Override
+    public void changeOrderStatus(long orderId, OrderStatus status) {
+        OrderEntity order = this.getOrderById(orderId);
+        if (OrderStatus.Cancelled.equals(order.getOrderStatus()))
+            throw new BusinessLogicException("Order was Cancelled, you cannot change status");
+        if (OrderStatus.Declined.equals(order.getOrderStatus()))
+            throw new BusinessLogicException("Order was Declined, you cannot change status");
+        if (OrderStatus.Completed.equals(order.getOrderStatus()))
+            throw new BusinessLogicException("Order was Completed, you cannot change status");
+        order.setOrderStatus(status);
+        order.setUpdateBy(this.userService.getUserById(SecurityContextUtil.getCurrentUser().getId()));
+        this.orderRepository.save(order);
     }
 }
