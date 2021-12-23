@@ -123,4 +123,16 @@ public class ProductVariantEntity {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    @Transient
+    public String getVariantString() {
+        String result = "";
+        for (int i = 0; i < this.variantOptions.size(); i++) {
+            result = result.concat(this.variantOptions.get(i).getAttributeValue().getAttribute().getName() + ": " + this.variantOptions.get(i).getAttributeValue().getValue());
+            if (this.variantOptions.size() >= 2 && i != this.variantOptions.size() - 1) {
+                result = result.concat(", ");
+            }
+        }
+        return result;
+    }
 }
