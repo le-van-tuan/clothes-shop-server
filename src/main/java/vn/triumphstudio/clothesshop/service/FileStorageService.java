@@ -8,4 +8,6 @@ public interface FileStorageService {
     FileUploadResponse uploadFile(MultipartFile file);
 
     Resource loadFile(String fileName);
+
+    void deleteFile(String fileName);
 }

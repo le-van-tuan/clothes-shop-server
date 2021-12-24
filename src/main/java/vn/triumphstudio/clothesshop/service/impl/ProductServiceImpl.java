@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import vn.triumphstudio.clothesshop.domain.entity.*;
@@ -17,6 +18,7 @@ import vn.triumphstudio.clothesshop.domain.model.AttributesInfo;
 import vn.triumphstudio.clothesshop.domain.model.OptionInfo;
 import vn.triumphstudio.clothesshop.domain.model.TierVariation;
 import vn.triumphstudio.clothesshop.domain.request.CategoryRequest;
+import vn.triumphstudio.clothesshop.domain.request.ClientFileInfo;
 import vn.triumphstudio.clothesshop.domain.request.ProductRequest;
 import vn.triumphstudio.clothesshop.domain.request.VariantRequest;
 import vn.triumphstudio.clothesshop.domain.response.FileUploadResponse;
@@ -50,6 +52,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductVariantRepository productVariantRepository;
+
+    @Autowired
+    private ProductImageRepository productImageRepository;
 
     @Override
     public List<CategoryEntity> getAllCategory() {
@@ -109,10 +114,13 @@ public class ProductServiceImpl implements ProductService {
         ProductDetail detail = new ProductDetail(productEntity);
 
         List<AttributeItem> specifications = new ArrayList<>();
+        List<AttributeItem> specificationIds = new ArrayList<>();
         for (ProductAttributeEntity productAttribute : productEntity.getProductAttributes()) {
             specifications.add(new AttributeItem(productAttribute.getAttributeValue().getAttribute().getName(), productAttribute.getAttributeValue().getValue()));
+            specificationIds.add(new AttributeItem(productAttribute.getAttributeValue().getAttribute().getId(), productAttribute.getAttributeValue().getId()));
         }
         detail.setSpecifications(specifications);
+        detail.setSpecificationIds(specificationIds);
 
         List<ProductVariantEntity> variants = productEntity.getVariants()
                 .stream()
@@ -228,6 +236,73 @@ public class ProductServiceImpl implements ProductService {
         product.setProductAttributes(attributeEntities);
         product.setImages(productImages);
         return this.productRepository.save(product);
+    }
+
+    @Override
+    @Transactional
+    public ProductEntity updateProduct(long id, ProductRequest request) {
+        ProductEntity existedProduct = this.getProductById(id);
+        existedProduct.setName(request.getName());
+        existedProduct.setCategory(this.getCategoryById(request.getCategory()));
+        existedProduct.setPublished(existedProduct.isPublished());
+        existedProduct.setDescription(request.getDescription());
+
+
+        List<ProductAttributeEntity> attributeEntities = new ArrayList<>();
+        for (AttributeItem specification : request.getSpecifications()) {
+            ProductAttributeEntity attribute = new ProductAttributeEntity();
+            String value = specification.getValue().toString();
+
+            attribute.setProduct(existedProduct);
+            attribute.setAttributeValue(this.attributeValueRepository.getOne(Long.valueOf(value)));
+            attributeEntities.add(attribute);
+        }
+        existedProduct.getProductAttributes().clear();
+        existedProduct.getProductAttributes().addAll(attributeEntities);
+
+        if (request.getThumbnail() != null) {
+            Optional<ProductImageEntity> optional = existedProduct.getImages().stream().filter(p -> p.getType().equals(ImageType.THUMBNAIL)).findFirst();
+            if (optional.isPresent()) {
+                ProductImageEntity existedThumb = this.productImageRepository.getOne(optional.get().getId());
+                this.fileStorageService.deleteFile(optional.get().getUrl());
+                this.productImageRepository.deleteById(existedThumb.getId());
+            }
+
+            FileUploadResponse uploaded = this.fileStorageService.uploadFile(request.getThumbnail());
+            ProductImageEntity thumbnail = new ProductImageEntity();
+            thumbnail.setProduct(existedProduct);
+            thumbnail.setType(ImageType.THUMBNAIL);
+            thumbnail.setUrl(uploaded.getFileName());
+            this.productImageRepository.save(thumbnail);
+        }
+
+        if (request.isUpdateGalleries()) {
+            if (!CollectionUtils.isEmpty(request.getDeletedGalleries())) {
+                Set<Long> removedIds = new HashSet<>();
+                for (ClientFileInfo clientFileInfo : request.getDeletedGalleries()) {
+                    if (clientFileInfo.isExisted() && Objects.equals(clientFileInfo.getStatus(), "removed")) {
+                        removedIds.add(clientFileInfo.getId());
+                    }
+                }
+                List<ProductImageEntity> beingDelete = existedProduct.getImages().stream()
+                        .filter(pImg -> pImg.getType().equals(ImageType.GALLERY) && removedIds.contains(pImg.getId())).collect(Collectors.toList());
+                for (ProductImageEntity gallery : beingDelete) {
+                    this.fileStorageService.deleteFile(gallery.getUrl());
+                    this.productImageRepository.deleteById(gallery.getId());
+                }
+            }
+            if (request.getGalleries() != null) {
+                for (MultipartFile multipartFile : request.getGalleries()) {
+                    FileUploadResponse uploaded = this.fileStorageService.uploadFile(multipartFile);
+                    ProductImageEntity gallery = new ProductImageEntity();
+                    gallery.setProduct(existedProduct);
+                    gallery.setType(ImageType.GALLERY);
+                    gallery.setUrl(uploaded.getFileName());
+                    this.productImageRepository.save(gallery);
+                }
+            }
+        }
+        return existedProduct;
     }
 
     @Override

@@ -34,6 +34,8 @@ public interface ProductService {
 
     ProductEntity addNewProduct(ProductRequest request);
 
+    ProductEntity updateProduct(long id, ProductRequest request);
+
     void publishProduct(long productId);
 
     void deleteProduct(long id);
@@ -45,6 +47,8 @@ public interface ProductService {
     AttributesInfo getAllAttributes();
 
     ProductVariantEntity addProductVariant(VariantRequest variantRequest);
+
+    ProductVariantEntity updateProductVariant(VariantRequest variantRequest);
 
     void deleteProductVariants(long variantId);
 

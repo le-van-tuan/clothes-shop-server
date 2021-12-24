@@ -23,6 +23,26 @@ public class VariantRequest {
     @JsonIgnore
     private MultipartFile[] galleries;
 
+    private List<ClientFileInfo> deletedGalleries;
+
+    private boolean updateGalleries;
+
+    public List<ClientFileInfo> getDeletedGalleries() {
+        return deletedGalleries;
+    }
+
+    public void setDeletedGalleries(List<ClientFileInfo> deletedGalleries) {
+        this.deletedGalleries = deletedGalleries;
+    }
+
+    public boolean isUpdateGalleries() {
+        return updateGalleries;
+    }
+
+    public void setUpdateGalleries(boolean updateGalleries) {
+        this.updateGalleries = updateGalleries;
+    }
+
     private List<AttributeItem> options;
 
     public long getProductId() {

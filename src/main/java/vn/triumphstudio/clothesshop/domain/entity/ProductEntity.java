@@ -29,8 +29,7 @@ public class ProductEntity {
     private List<ProductImageEntity> images;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
     private List<ProductAttributeEntity> productAttributes;
 
     @OneToMany(fetch = FetchType.LAZY,

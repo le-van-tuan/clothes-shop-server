@@ -11,6 +11,8 @@ public class ProductDetail extends ProductEntity {
 
     private List<AttributeItem> specifications;
 
+    private List<AttributeItem> specificationIds;
+
     private List<TierVariation> tierVariations;
 
     public ProductDetail(ProductEntity product) {
@@ -23,6 +25,14 @@ public class ProductDetail extends ProductEntity {
 
     public void setSpecifications(List<AttributeItem> specifications) {
         this.specifications = specifications;
+    }
+
+    public List<AttributeItem> getSpecificationIds() {
+        return specificationIds;
+    }
+
+    public void setSpecificationIds(List<AttributeItem> specificationIds) {
+        this.specificationIds = specificationIds;
     }
 
     public List<TierVariation> getTierVariations() {

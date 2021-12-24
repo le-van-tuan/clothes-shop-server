@@ -3,6 +3,8 @@ package vn.triumphstudio.clothesshop.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import vn.triumphstudio.clothesshop.domain.enumration.ImageType;
 
 import javax.persistence.*;
@@ -19,8 +21,9 @@ public class ProductImageEntity {
     private long id;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ProductEntity product;
 
     @Column(name = "image_type")

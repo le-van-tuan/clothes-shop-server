@@ -1,5 +1,6 @@
 package vn.triumphstudio.clothesshop.service.impl;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +78,16 @@ public class FileStorageServiceImpl implements FileStorageService {
             }
         } catch (MalformedURLException e) {
             throw new ResourceNotFoundException("Could not read file: " + fileName);
+        }
+    }
+
+    @Override
+    public void deleteFile(String fileName) {
+        Path file = rootLocation.resolve(fileName);
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -97,8 +97,23 @@ public class AdminController {
         return this.productService.addNewProduct(request);
     }
 
+    @PatchMapping(value = "/products/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ProductEntity updateProduct(@PathVariable long id, @RequestParam("product") String request, @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail, @RequestParam(value = "galleries", required = false) MultipartFile[] galleries) throws IOException {
+        ProductRequest product = this.objectMapper.readValue(request, ProductRequest.class);
+        product.setThumbnail(thumbnail);
+        product.setGalleries(galleries);
+        return this.productService.updateProduct(id, product);
+    }
+
     @PostMapping(value = "/products/variants", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ProductVariantEntity addProductVariant(@RequestParam("variant") String variant, @RequestParam(value = "galleries") MultipartFile[] galleries) throws IOException {
+        VariantRequest variantRequest = this.objectMapper.readValue(variant, VariantRequest.class);
+        variantRequest.setGalleries(galleries);
+        return this.productService.addProductVariant(variantRequest);
+    }
+
+    @PatchMapping(value = "/products/variants/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ProductVariantEntity updateProductVariant(@PathVariable long id, @RequestParam("variant") String variant, @RequestParam(value = "galleries") MultipartFile[] galleries) throws IOException {
         VariantRequest variantRequest = this.objectMapper.readValue(variant, VariantRequest.class);
         variantRequest.setGalleries(galleries);
         return this.productService.addProductVariant(variantRequest);

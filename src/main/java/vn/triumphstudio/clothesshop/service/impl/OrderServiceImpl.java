@@ -13,6 +13,7 @@ import vn.triumphstudio.clothesshop.domain.request.OrderItemRequest;
 import vn.triumphstudio.clothesshop.domain.request.OrderRequest;
 import vn.triumphstudio.clothesshop.exception.BusinessLogicException;
 import vn.triumphstudio.clothesshop.repository.OrderRepository;
+import vn.triumphstudio.clothesshop.repository.ProductVariantRepository;
 import vn.triumphstudio.clothesshop.service.OrderService;
 import vn.triumphstudio.clothesshop.service.ProductService;
 import vn.triumphstudio.clothesshop.service.UserService;
@@ -33,6 +34,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private ProductVariantRepository productVariantRepository;
 
     @Override
     @Transactional
@@ -58,6 +62,11 @@ public class OrderServiceImpl implements OrderService {
             OrderItemEntity item = new OrderItemEntity();
 
             ProductVariantEntity variant = this.productService.getProductVariantById(itemRequest.getVariantId());
+            if (variant.getStock() < itemRequest.getQuantity())
+                throw new BusinessLogicException("Variant: " + variant.getVariantString() + " doesn't enough item to order.");
+            variant.setStock(variant.getStock() - itemRequest.getQuantity());
+            productVariantRepository.save(variant);
+
             item.setOrder(order);
             item.setProduct(this.productService.getProductById(itemRequest.getProductId()));
             item.setVariant(variant);
@@ -92,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderEntity cancelUserOrder(long userId, long orderId) {
         OrderEntity order = this.orderRepository.findFirstByUser_IdAndId(userId, orderId);
         if (order == null) throw new BusinessLogicException("No order found with id = " + orderId);
@@ -103,6 +113,12 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessLogicException("Order was Shipped, you can not cancel");
         if (OrderStatus.Completed.equals(order.getOrderStatus()))
             throw new BusinessLogicException("Order was Completed, you can not cancel");
+
+        for (OrderItemEntity orderItem : order.getOrderItems()) {
+            ProductVariantEntity variant = this.productService.getProductVariantById(orderItem.getVariant().getId());
+            variant.setStock(variant.getStock() + orderItem.getQuantity());
+            this.productVariantRepository.save(variant);
+        }
 
         order.setOrderStatus(OrderStatus.Cancelled);
         return this.orderRepository.save(order);
@@ -128,6 +144,15 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessLogicException("Order was Declined, you cannot change status");
         if (OrderStatus.Completed.equals(order.getOrderStatus()))
             throw new BusinessLogicException("Order was Completed, you cannot change status");
+
+        if (status.equals(OrderStatus.Declined) || status.equals(OrderStatus.Cancelled)) {
+            for (OrderItemEntity orderItem : order.getOrderItems()) {
+                ProductVariantEntity variant = this.productService.getProductVariantById(orderItem.getVariant().getId());
+                variant.setStock(variant.getStock() + orderItem.getQuantity());
+                this.productVariantRepository.save(variant);
+            }
+        }
+
         order.setOrderStatus(status);
         order.setUpdateBy(this.userService.getUserById(SecurityContextUtil.getCurrentUser().getId()));
         this.orderRepository.save(order);

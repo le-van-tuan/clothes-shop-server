@@ -19,7 +19,6 @@ CREATE TABLE attribute_values(
     value VARCHAR(255),
     created_at  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE attribute_values ADD CONSTRAINT fk_attribute_values FOREIGN KEY (attribute_id) REFERENCES attributes(id) ON DELETE NO ACTION;
 
 CREATE TABLE products(
     id  SERIAL  NOT NULL    PRIMARY KEY,
@@ -30,7 +29,6 @@ CREATE TABLE products(
     deleted BOOLEAN  DEFAULT FALSE,
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE products ADD CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE NO ACTION;
 
 CREATE TABLE product_images(
     id              SERIAL           NOT NULL      PRIMARY KEY,
@@ -39,7 +37,6 @@ CREATE TABLE product_images(
     image_url varchar(255),
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE product_images ADD CONSTRAINT fk_product_image_product FOREIGN KEY (product_id) REFERENCES products(id);
 
 CREATE TABLE product_attributes(
     id  SERIAL  NOT NULL    PRIMARY KEY,
@@ -47,8 +44,6 @@ CREATE TABLE product_attributes(
     attribute_value_id BIGINT     NOT NULL,
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE product_attributes ADD CONSTRAINT fk_product_attribute_product FOREIGN KEY (product_id) REFERENCES products(id);
-ALTER TABLE product_attributes ADD CONSTRAINT fk_product_attribute_attribute_value FOREIGN KEY (attribute_value_id) REFERENCES attribute_values(id) ON DELETE NO ACTION;
 
 CREATE TABLE product_variants(
     id  SERIAL  NOT NULL    PRIMARY KEY,
@@ -60,7 +55,6 @@ CREATE TABLE product_variants(
     deleted    BOOLEAN  DEFAULT FALSE,
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE product_variants ADD CONSTRAINT fk_product_variants_product FOREIGN KEY (product_id) REFERENCES products(id);
 
 CREATE TABLE product_variant_images(
     id              SERIAL           NOT NULL      PRIMARY KEY,
@@ -68,7 +62,6 @@ CREATE TABLE product_variant_images(
     image_url varchar(255),
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE product_variant_images ADD CONSTRAINT fk_product_variant_images_product_variant FOREIGN KEY (product_variant_id) REFERENCES product_variants(id) ON DELETE NO ACTION;
 
 CREATE TABLE product_variant_options(
     id  SERIAL  NOT NULL    PRIMARY KEY,
@@ -76,8 +69,6 @@ CREATE TABLE product_variant_options(
     attribute_value_id BIGINT     NOT NULL,
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE product_variant_options ADD CONSTRAINT fk_product_variant_options_product_variants FOREIGN KEY (product_variant_id) REFERENCES product_variants(id) ON DELETE NO ACTION;
-ALTER TABLE product_variant_options ADD CONSTRAINT fk_product_variant_options_attribute_value FOREIGN KEY (attribute_value_id) REFERENCES attribute_values(id) ON DELETE NO ACTION;
 
 CREATE TABLE wishlist(
     id  SERIAL  NOT NULL    PRIMARY KEY,
@@ -85,6 +76,4 @@ CREATE TABLE wishlist(
     user_id BIGINT   NOT NULL,
     created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE wishlist ADD CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE NO ACTION;
-ALTER TABLE wishlist ADD CONSTRAINT fk_wishlist_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION;
 

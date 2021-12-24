@@ -26,6 +26,10 @@ public class ProductRequest {
     @JsonIgnore
     private MultipartFile[] galleries;
 
+    private List<ClientFileInfo> deletedGalleries;
+
+    private boolean updateGalleries;
+
     private List<AttributeItem> specifications;
 
     public String getName() {
@@ -66,6 +70,22 @@ public class ProductRequest {
 
     public void setGalleries(MultipartFile[] galleries) {
         this.galleries = galleries;
+    }
+
+    public List<ClientFileInfo> getDeletedGalleries() {
+        return deletedGalleries;
+    }
+
+    public void setDeletedGalleries(List<ClientFileInfo> deletedGalleries) {
+        this.deletedGalleries = deletedGalleries;
+    }
+
+    public boolean isUpdateGalleries() {
+        return updateGalleries;
+    }
+
+    public void setUpdateGalleries(boolean updateGalleries) {
+        this.updateGalleries = updateGalleries;
     }
 
     public List<AttributeItem> getSpecifications() {

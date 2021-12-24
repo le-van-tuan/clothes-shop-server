@@ -9,7 +9,7 @@ public class AttributeItem {
     public AttributeItem() {
     }
 
-    public AttributeItem(String name, Object value) {
+    public AttributeItem(Object name, Object value) {
         this.name = name;
         this.value = value;
     }
