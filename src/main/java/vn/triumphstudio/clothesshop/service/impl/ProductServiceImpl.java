@@ -59,6 +59,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductVariantOptionRepository productVariantOptionRepository;
 
+    @Autowired
+    private ProductVariantImageRepository productVariantImageRepository;
+
     @Override
     public List<CategoryEntity> getAllCategory() {
         return this.categoryRepository.findAll();
@@ -414,6 +417,31 @@ public class ProductServiceImpl implements ProductService {
         }
         existedVariant.setVariantOptions(productVariantOptions);
 
+        if (variantRequest.isUpdateGalleries()) {
+            if (!CollectionUtils.isEmpty(variantRequest.getDeletedGalleries())) {
+                Set<Long> removedIds = new HashSet<>();
+                for (ClientFileInfo clientFileInfo : variantRequest.getDeletedGalleries()) {
+                    if (clientFileInfo.isExisted() && Objects.equals(clientFileInfo.getStatus(), "removed")) {
+                        removedIds.add(clientFileInfo.getId());
+                    }
+                }
+                List<ProductVariantImageEntity> beingDelete = existedVariant.getImages().stream()
+                        .filter(pImg -> removedIds.contains(pImg.getId())).collect(Collectors.toList());
+                for (ProductVariantImageEntity gallery : beingDelete) {
+                    this.fileStorageService.deleteFile(gallery.getUrl());
+                    this.productVariantImageRepository.deleteById(gallery.getId());
+                }
+            }
+            if (variantRequest.getGalleries() != null) {
+                for (MultipartFile multipartFile : variantRequest.getGalleries()) {
+                    FileUploadResponse uploaded = this.fileStorageService.uploadFile(multipartFile);
+                    ProductVariantImageEntity gallery = new ProductVariantImageEntity();
+                    gallery.setProductVariant(existedVariant);
+                    gallery.setUrl(uploaded.getFileName());
+                    this.productVariantImageRepository.save(gallery);
+                }
+            }
+        }
         return existedVariant;
     }
 
