@@ -27,6 +27,8 @@ public class VariantRequest {
 
     private boolean updateGalleries;
 
+    private List<AttributeItem> options;
+
     public List<ClientFileInfo> getDeletedGalleries() {
         return deletedGalleries;
     }
@@ -42,8 +44,6 @@ public class VariantRequest {
     public void setUpdateGalleries(boolean updateGalleries) {
         this.updateGalleries = updateGalleries;
     }
-
-    private List<AttributeItem> options;
 
     public long getProductId() {
         return productId;

@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
+import vn.triumphstudio.clothesshop.domain.model.AttributeItem;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -39,8 +41,7 @@ public class ProductVariantEntity {
     @JoinColumn(name = "product_variant_id", referencedColumnName = "id")
     private List<ProductVariantImageEntity> images;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_variant_id", referencedColumnName = "id")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productVariant")
     private List<ProductVariantOptionEntity> variantOptions;
 
     @Column(name = "created_at")
@@ -134,5 +135,14 @@ public class ProductVariantEntity {
             }
         }
         return result;
+    }
+
+    @Transient
+    public List<AttributeItem> getOptionsIds() {
+        List<AttributeItem> optionsIds = new ArrayList<>();
+        for (ProductVariantOptionEntity variantOption : this.variantOptions) {
+            optionsIds.add(new AttributeItem(variantOption.getAttributeValue().getAttribute().getId(), variantOption.getAttributeValue().getId()));
+        }
+        return optionsIds;
     }
 }

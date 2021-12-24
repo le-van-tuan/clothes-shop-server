@@ -3,7 +3,6 @@ package vn.triumphstudio.clothesshop.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.triumphstudio.clothesshop.domain.annotation.AllowAdmin;
@@ -106,17 +105,17 @@ public class AdminController {
     }
 
     @PostMapping(value = "/products/variants", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ProductVariantEntity addProductVariant(@RequestParam("variant") String variant, @RequestParam(value = "galleries") MultipartFile[] galleries) throws IOException {
+    public ProductVariantEntity addProductVariant(@RequestParam("variant") String variant, @RequestParam(value = "galleries", required = false) MultipartFile[] galleries) throws IOException {
         VariantRequest variantRequest = this.objectMapper.readValue(variant, VariantRequest.class);
         variantRequest.setGalleries(galleries);
         return this.productService.addProductVariant(variantRequest);
     }
 
     @PatchMapping(value = "/products/variants/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ProductVariantEntity updateProductVariant(@PathVariable long id, @RequestParam("variant") String variant, @RequestParam(value = "galleries") MultipartFile[] galleries) throws IOException {
+    public ProductVariantEntity updateProductVariant(@PathVariable long id, @RequestParam("variant") String variant, @RequestParam(value = "galleries", required = false) MultipartFile[] galleries) throws IOException {
         VariantRequest variantRequest = this.objectMapper.readValue(variant, VariantRequest.class);
         variantRequest.setGalleries(galleries);
-        return this.productService.addProductVariant(variantRequest);
+        return this.productService.updateProductVariant(id, variantRequest);
     }
 
     @DeleteMapping("/products/variants/{id}")

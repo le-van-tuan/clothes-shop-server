@@ -48,7 +48,7 @@ public interface ProductService {
 
     ProductVariantEntity addProductVariant(VariantRequest variantRequest);
 
-    ProductVariantEntity updateProductVariant(VariantRequest variantRequest);
+    ProductVariantEntity updateProductVariant(long id, VariantRequest variantRequest);
 
     void deleteProductVariants(long variantId);
 

@@ -56,6 +56,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductImageRepository productImageRepository;
 
+    @Autowired
+    private ProductVariantOptionRepository productVariantOptionRepository;
+
     @Override
     public List<CategoryEntity> getAllCategory() {
         return this.categoryRepository.findAll();
@@ -389,6 +392,34 @@ public class ProductServiceImpl implements ProductService {
         variant.setVariantOptions(productVariantOptions);
 
         return this.productVariantRepository.save(variant);
+    }
+
+    @Override
+    @Transactional
+    public ProductVariantEntity updateProductVariant(long id, VariantRequest variantRequest) {
+        ProductVariantEntity existedVariant = this.getProductVariantById(id);
+        existedVariant.setCost(variantRequest.getCost());
+        existedVariant.setPrice(variantRequest.getPrice());
+        existedVariant.setStock(variantRequest.getStock());
+
+        this.removeVariantOptions(existedVariant.getVariantOptions());
+        List<ProductVariantOptionEntity> productVariantOptions = new ArrayList<>();
+        for (AttributeItem attributeItem : variantRequest.getOptions()) {
+            ProductVariantOptionEntity option = new ProductVariantOptionEntity();
+            String value = attributeItem.getValue().toString();
+
+            option.setAttributeValue(this.attributeValueRepository.getOne(Long.valueOf(value)));
+            option.setProductVariant(existedVariant);
+            productVariantOptions.add(option);
+        }
+        existedVariant.setVariantOptions(productVariantOptions);
+
+        return existedVariant;
+    }
+
+    @Transactional
+    private void removeVariantOptions(List<ProductVariantOptionEntity> productVariantOptionEntities) {
+        this.productVariantOptionRepository.deleteAll(productVariantOptionEntities);
     }
 
     @Override
