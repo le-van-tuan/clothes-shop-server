@@ -116,6 +116,18 @@ public class ProductServiceImpl implements ProductService {
         return this.parseProduct2ProductDetails(product);
     }
 
+    @Override
+    public Page<ProductEntity> filterProducts(List<Long> categories) {
+        int size = Integer.MAX_VALUE;
+        Pageable pageable = PageRequest.of(0, size);
+
+        Specification<ProductEntity> productSpecs = ProductSpecification.byDeletedStatus(false)
+                .and(ProductSpecification.byPublishedStatus(true))
+                .and(ProductSpecification.byCategories(categories));
+
+        return this.productRepository.findAll(productSpecs, pageable);
+    }
+
     private ProductDetail parseProduct2ProductDetails(ProductEntity productEntity) {
         ProductDetail detail = new ProductDetail(productEntity);
 

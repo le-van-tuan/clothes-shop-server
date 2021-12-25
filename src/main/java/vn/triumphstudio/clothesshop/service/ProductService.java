@@ -26,6 +26,8 @@ public interface ProductService {
 
     ProductDetail getProductDetailsById(long id);
 
+    Page<ProductEntity> filterProducts(List<Long> categories);
+
     Page<ProductEntity> filterProducts(int page, int size, List<Long> categories, Boolean published);
 
     List<ProductEntity> getNewArrivals(int size);

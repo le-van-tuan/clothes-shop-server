@@ -29,7 +29,7 @@ public class ProductSpecification {
             if (categories == null || categories.isEmpty()) {
                 return criteriaBuilder.and();
             }
-            return root.get("category_id").in(categories);
+            return root.get("category").get("id").in(categories);
         };
     }
 }
