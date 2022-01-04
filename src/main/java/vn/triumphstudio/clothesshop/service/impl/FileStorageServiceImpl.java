@@ -1,6 +1,5 @@
 package vn.triumphstudio.clothesshop.service.impl;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
